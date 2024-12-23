@@ -45,9 +45,10 @@ There are several tools online you can use, I'd recommend [Draw.io](https://www.
 
 **HINT:** You do not need to create any data for this prompt. This is a conceptual model only. 
 
+![Employee Shifts ERD](./images/prompt_1.png)
 #### Prompt 2
 We want to create employee shifts, splitting up the day into morning and evening. Add this to the ERD.
-
+![Employee Shifts ERD](./images/prompt_2.png)
 #### Prompt 3
 The store wants to keep customer addresses. Propose two architectures for the CUSTOMER_ADDRESS table, one that will retain changes, and another that will overwrite. Which is type 1, which is type 2? 
 
@@ -56,7 +57,37 @@ The store wants to keep customer addresses. Propose two architectures for the CU
 ```
 Your answer...
 ```
+In a Type 1 Slowly Changing Dimension (SCD), changes to customer addresses would be overwritten, and no history would be maintaned. This means that the table always contains the most recent address for each customer.
 
+E.g.
+CREATE TABLE customer_addresses (
+    id INT PRIMARY KEY,
+    customer_id INT,
+    address_line_1 VARCHAR(255),
+    address_line_2 VARCHAR(255),
+    city VARCHAR(100),
+    prov VARCHAR(100),
+    postal_code VARCHAR(20),
+    country VARCHAR(100),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+In a Type 2 Slowly Changing Dimension (SCD), changes to customer addresses would be retained by adding a new row for the new value, and the existing row is kept for historical and reporting purposes.
+
+E.g.
+CREATE TABLE customer_addresses (
+    customer_id INT,
+    address_line_1 VARCHAR(255),
+    address_line_2 VARCHAR(255),
+    city VARCHAR(100),
+    prov VARCHAR(100),
+    postal_code VARCHAR(20),
+    country VARCHAR(100),
+    start_date CURRENT_TIMESTAMP,
+    end_date CURRENT_TIMESTAMP,
+    is_current BOOLEAN,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
 ***
 
 ## Section 2:
